@@ -23,7 +23,8 @@ import java.util.Optional;
 
 /**
  * Service Implementation for Cart operations in Bihari E-Cart.
- * Enforces business rules, stock validation, security context checks, and transactional integrity.
+ * Enforces business rules, stock validation, security context checks, and
+ * transactional integrity.
  */
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,8 @@ public class CartServiceImpl implements CartService {
         Cart cart = getOrCreateCart(user);
 
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + request.getProductId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Product not found with id: " + request.getProductId()));
 
         if (Boolean.FALSE.equals(product.getActive())) {
             throw new IllegalArgumentException("Cannot add inactive or deleted product to cart");
@@ -54,7 +56,8 @@ public class CartServiceImpl implements CartService {
 
         int requestedQuantity = request.getQuantity();
 
-        // Rule 5: If product already exists, increment quantity instead of creating new row
+        // Rule 5: If product already exists, increment quantity instead of creating new
+        // row
         Optional<CartItem> existingItemOpt = cartItemRepository.findByCartAndProduct(cart, product);
 
         if (existingItemOpt.isPresent()) {
@@ -63,18 +66,22 @@ public class CartServiceImpl implements CartService {
 
             // Stock Validation 2: Ensure combined quantity does not exceed available stock
             if (newQuantity > product.getStockQuantity()) {
-                throw new IllegalArgumentException("Cannot add " + requestedQuantity + " unit(s). Total requested quantity (" 
-                        + newQuantity + ") exceeds available stock (" + product.getStockQuantity() + ") for product '" + product.getName() + "'");
+                throw new IllegalArgumentException(
+                        "Cannot add " + requestedQuantity + " unit(s). Total requested quantity ("
+                                + newQuantity + ") exceeds available stock (" + product.getStockQuantity()
+                                + ") for product '" + product.getName() + "'");
             }
 
             existingItem.setQuantity(newQuantity);
             // Price Decision: Preserve original priceAtAddition when item was first added.
             // Do NOT overwrite with current product price to maintain historical snapshot.
         } else {
-            // Stock Validation 3: Ensure initial requested quantity does not exceed available stock
+            // Stock Validation 3: Ensure initial requested quantity does not exceed
+            // available stock
             if (requestedQuantity > product.getStockQuantity()) {
-                throw new IllegalArgumentException("Requested quantity (" + requestedQuantity 
-                        + ") exceeds available stock (" + product.getStockQuantity() + ") for product '" + product.getName() + "'");
+                throw new IllegalArgumentException("Requested quantity (" + requestedQuantity
+                        + ") exceeds available stock (" + product.getStockQuantity() + ") for product '"
+                        + product.getName() + "'");
             }
 
             CartItem newItem = new CartItem();
@@ -121,9 +128,11 @@ public class CartServiceImpl implements CartService {
             Product product = cartItem.getProduct();
 
             // Stock Validation 4: Ensure updated quantity does not exceed available stock
-            if (product != null && product.getStockQuantity() != null && request.getQuantity() > product.getStockQuantity()) {
-                throw new IllegalArgumentException("Requested quantity (" + request.getQuantity() 
-                        + ") exceeds available stock (" + product.getStockQuantity() + ") for product '" + product.getName() + "'");
+            if (product != null && product.getStockQuantity() != null
+                    && request.getQuantity() > product.getStockQuantity()) {
+                throw new IllegalArgumentException("Requested quantity (" + request.getQuantity()
+                        + ") exceeds available stock (" + product.getStockQuantity() + ") for product '"
+                        + product.getName() + "'");
             }
 
             cartItem.setQuantity(request.getQuantity());
