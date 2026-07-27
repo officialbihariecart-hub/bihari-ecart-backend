@@ -166,6 +166,81 @@ public class OrderServiceImpl implements OrderService {
         return mapToOrderResponse(updatedOrder);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getAllOrdersForAdmin() {
+        List<Order> orders = orderRepository.findAllOrdersWithItemsOrderByCreatedAtDesc();
+        return orders.stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getOrdersByStatusForAdmin(OrderStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+        List<Order> orders = orderRepository.findByStatusWithItemsOrderByCreatedAtDesc(status);
+        return orders.stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse updateOrderStatusForAdmin(Long orderId, com.bihariecart.dto.UpdateOrderStatusRequest request) {
+        if (request == null || request.getStatus() == null) {
+            throw new IllegalArgumentException("Order status is required");
+        }
+
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+
+        OrderStatus currentStatus = order.getStatus();
+        OrderStatus newStatus = request.getStatus();
+
+        // Business rule 1: If order is CANCELLED, status cannot be changed to anything else
+        if (currentStatus == OrderStatus.CANCELLED && newStatus != OrderStatus.CANCELLED) {
+            throw new IllegalArgumentException("Cannot update status of a CANCELLED order");
+        }
+
+        // Business rule 2: If order is DELIVERED, it cannot transition back to PENDING or PROCESSING
+        if (currentStatus == OrderStatus.DELIVERED && (newStatus == OrderStatus.PENDING || newStatus == OrderStatus.PROCESSING)) {
+            throw new IllegalArgumentException("Cannot transition a DELIVERED order back to " + newStatus);
+        }
+
+        // Business rule 3: If admin cancels an order (from PENDING/PROCESSING), restore stock
+        if (newStatus == OrderStatus.CANCELLED && currentStatus != OrderStatus.CANCELLED) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product != null && product.getStockQuantity() != null) {
+                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
+
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+        return mapToOrderResponse(updatedOrder);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse updatePaymentStatusForAdmin(Long orderId, com.bihariecart.dto.UpdatePaymentStatusRequest request) {
+        if (request == null || request.getPaymentStatus() == null) {
+            throw new IllegalArgumentException("Payment status is required");
+        }
+
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+
+        order.setPaymentStatus(request.getPaymentStatus());
+        Order updatedOrder = orderRepository.save(order);
+        return mapToOrderResponse(updatedOrder);
+    }
+
     /**
      * Generates a unique order number in the format: ORD-YYYYMMDD-XXXXXX
      */

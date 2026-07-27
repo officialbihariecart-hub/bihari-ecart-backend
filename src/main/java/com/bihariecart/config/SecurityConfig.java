@@ -39,6 +39,7 @@ public class SecurityConfig {
                                                                 "/v3/api-docs/**",
                                                                 "/swagger-resources/**")
                                                 .permitAll()
+                                                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                                                 .anyRequest().authenticated())
 
                                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -49,6 +50,12 @@ public class SecurityConfig {
                                                         response.setContentType("application/json");
                                                         response.getWriter().write(
                                                                         "{\"error\": \"Unauthorized — Please provide a valid JWT token\"}");
+                                                })
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        response.setStatus(403);
+                                                        response.setContentType("application/json");
+                                                        response.getWriter().write(
+                                                                        "{\"error\": \"Forbidden — Access denied. Admin privileges required.\"}");
                                                 }))
 
                                 .formLogin(form -> form.disable())
