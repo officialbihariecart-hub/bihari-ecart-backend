@@ -48,6 +48,12 @@ public class Product {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @Column(name = "average_rating")
+    private Double averageRating = 0.0;
+
+    @Column(name = "review_count")
+    private Integer reviewCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -59,6 +65,12 @@ public class Product {
 
     @PrePersist
     protected void onCreate() {
+        if (this.averageRating == null) {
+            this.averageRating = 0.0;
+        }
+        if (this.reviewCount == null) {
+            this.reviewCount = 0;
+        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

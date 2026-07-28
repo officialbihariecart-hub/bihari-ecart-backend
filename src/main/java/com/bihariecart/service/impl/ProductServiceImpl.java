@@ -8,8 +8,10 @@ import com.bihariecart.exception.DuplicateResourceException;
 import com.bihariecart.exception.ResourceNotFoundException;
 import com.bihariecart.repository.CategoryRepository;
 import com.bihariecart.repository.ProductRepository;
+import com.bihariecart.repository.ReviewRepository;
 import com.bihariecart.service.ProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,10 +21,12 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ReviewRepository reviewRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ReviewRepository reviewRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -103,6 +107,29 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(product);
     }
 
+    @Override
+    @Transactional
+    public void updateProductRating(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+
+        Double rawAverage = reviewRepository.averageRatingByProductId(productId);
+        Long totalCount = reviewRepository.countByProductId(productId);
+
+        double averageRating = 0.0;
+        int reviewCount = 0;
+
+        if (totalCount != null && totalCount > 0 && rawAverage != null) {
+            averageRating = Math.round(rawAverage * 10.0) / 10.0;
+            reviewCount = totalCount.intValue();
+        }
+
+        product.setAverageRating(averageRating);
+        product.setReviewCount(reviewCount);
+
+        productRepository.save(product);
+    }
+
     private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
@@ -115,6 +142,8 @@ public class ProductServiceImpl implements ProductService {
                 .active(product.getActive())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .averageRating(product.getAverageRating() != null ? product.getAverageRating() : 0.0)
+                .reviewCount(product.getReviewCount() != null ? product.getReviewCount() : 0)
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();
