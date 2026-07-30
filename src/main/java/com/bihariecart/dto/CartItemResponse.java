@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * Data Transfer Object representing a cart item in API responses.
  */
@@ -21,6 +23,6 @@ public class CartItemResponse {
     private String productName;
     private String productImageUrl;
     private Integer quantity;
-    private Double priceAtAddition;
-    private Double subTotal;
+    private BigDecimal priceAtAddition;
+    private BigDecimal subTotal;
 }

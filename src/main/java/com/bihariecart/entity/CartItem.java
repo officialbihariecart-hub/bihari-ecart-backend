@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * Entity representing an individual line item inside a Shopping Cart.
  * Maintains historical price snapshot (priceAtAddition) to handle price fluctuation safely.
@@ -38,18 +40,18 @@ public class CartItem {
     private Integer quantity;
 
     @NotNull(message = "Price at addition is required")
-    @Column(nullable = false)
-    private Double priceAtAddition;
+    @Column(name = "price_at_addition", nullable = false, precision = 12, scale = 2)
+    private BigDecimal priceAtAddition;
 
     /**
      * Calculates the subtotal for this item dynamically (quantity * priceAtAddition).
      * 
      * @return dynamic line subtotal
      */
-    public Double getSubTotal() {
+    public BigDecimal getSubTotal() {
         if (priceAtAddition == null || quantity == null) {
-            return 0.0;
+            return BigDecimal.ZERO;
         }
-        return priceAtAddition * quantity;
+        return priceAtAddition.multiply(BigDecimal.valueOf(quantity));
     }
 }

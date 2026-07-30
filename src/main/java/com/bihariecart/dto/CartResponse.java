@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,5 +27,5 @@ public class CartResponse {
     @Builder.Default
     private List<CartItemResponse> items = new ArrayList<>();
     private Integer totalItems;
-    private Double totalAmount;
+    private BigDecimal totalAmount;
 }

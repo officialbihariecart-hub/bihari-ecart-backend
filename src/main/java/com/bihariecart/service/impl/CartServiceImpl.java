@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +89,7 @@ public class CartServiceImpl implements CartService {
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(requestedQuantity);
-            newItem.setPriceAtAddition(product.getPrice());
+            newItem.setPriceAtAddition(BigDecimal.valueOf(product.getPrice()));
             cart.addItem(newItem);
             cartItemRepository.save(newItem);
         }
@@ -109,8 +110,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponse updateCartItem(String userEmail, Long itemId, UpdateCartRequest request) {
+        User user = getUserByEmail(userEmail);
         Cart cart = cartRepository.findByUserEmailWithItems(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user: " + userEmail));
+                .orElseGet(() -> getOrCreateCart(user));
 
         CartItem cartItem = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + itemId));
@@ -144,8 +146,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponse removeCartItem(String userEmail, Long itemId) {
+        User user = getUserByEmail(userEmail);
         Cart cart = cartRepository.findByUserEmailWithItems(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user: " + userEmail));
+                .orElseGet(() -> getOrCreateCart(user));
 
         CartItem cartItem = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + itemId));
@@ -197,9 +200,10 @@ public class CartServiceImpl implements CartService {
                 .mapToInt(CartItemResponse::getQuantity)
                 .sum();
 
-        double totalAmount = itemResponses.stream()
-                .mapToDouble(CartItemResponse::getSubTotal)
-                .sum();
+        BigDecimal totalAmount = itemResponses.stream()
+                .map(CartItemResponse::getSubTotal)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return CartResponse.builder()
                 .id(cart.getId())
