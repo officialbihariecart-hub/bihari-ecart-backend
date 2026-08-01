@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
+
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,7 +87,7 @@ public class CartControllerIntegrationTest {
 
         testProduct = new Product();
         testProduct.setName("Controller Phone");
-        testProduct.setPrice(19999.0);
+        testProduct.setPrice(new BigDecimal("19999.00"));
         testProduct.setStockQuantity(10);
         testProduct.setCategory(category);
         testProduct.setActive(true);

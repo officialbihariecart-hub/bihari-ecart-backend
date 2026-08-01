@@ -89,7 +89,7 @@ public class CartServiceImpl implements CartService {
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(requestedQuantity);
-            newItem.setPriceAtAddition(BigDecimal.valueOf(product.getPrice()));
+            newItem.setPriceAtAddition(product.getPrice());
             cart.addItem(newItem);
             cartItemRepository.save(newItem);
         }

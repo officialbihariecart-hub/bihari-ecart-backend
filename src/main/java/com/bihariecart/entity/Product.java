@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,8 +34,8 @@ public class Product {
 
     @NotNull(message = "Price is required")
     @PositiveOrZero(message = "Price must be greater than or equal to zero")
-    @Column(nullable = false)
-    private Double price;
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal price;
 
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock quantity cannot be negative")

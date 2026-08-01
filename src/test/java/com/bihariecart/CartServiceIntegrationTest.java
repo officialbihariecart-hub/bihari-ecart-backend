@@ -70,7 +70,7 @@ public class CartServiceIntegrationTest {
         // Create Product 1 (Active, Stock 10, Price 500.00)
         product1 = new Product();
         product1.setName("Wireless Mouse");
-        product1.setPrice(500.0);
+        product1.setPrice(new BigDecimal("500.00"));
         product1.setStockQuantity(10);
         product1.setCategory(category);
         product1.setActive(true);
@@ -79,7 +79,7 @@ public class CartServiceIntegrationTest {
         // Create Product 2 (Active, Stock 5, Price 1500.00)
         product2 = new Product();
         product2.setName("Mechanical Keyboard");
-        product2.setPrice(1500.0);
+        product2.setPrice(new BigDecimal("1500.00"));
         product2.setStockQuantity(5);
         product2.setCategory(category);
         product2.setActive(true);
@@ -88,7 +88,7 @@ public class CartServiceIntegrationTest {
         // Create Inactive Product
         inactiveProduct = new Product();
         inactiveProduct.setName("Discontinued Headset");
-        inactiveProduct.setPrice(800.0);
+        inactiveProduct.setPrice(new BigDecimal("800.00"));
         inactiveProduct.setStockQuantity(10);
         inactiveProduct.setCategory(category);
         inactiveProduct.setActive(false);
@@ -97,7 +97,7 @@ public class CartServiceIntegrationTest {
         // Create Out of Stock Product
         outOfStockProduct = new Product();
         outOfStockProduct.setName("Sold Out Monitor");
-        outOfStockProduct.setPrice(12000.0);
+        outOfStockProduct.setPrice(new BigDecimal("12000.00"));
         outOfStockProduct.setStockQuantity(0);
         outOfStockProduct.setCategory(category);
         outOfStockProduct.setActive(true);

@@ -61,7 +61,7 @@ public class OrderServiceIntegrationTest {
         // 3. Create Product
         Product product = new Product();
         product.setName("Samsung Galaxy S24");
-        product.setPrice(79999.0);
+        product.setPrice(new BigDecimal("79999.00"));
         product.setStockQuantity(10);
         product.setCategory(category);
         product.setActive(true);

@@ -101,7 +101,7 @@ public class AdminOrderIntegrationTest {
 
         Product product = new Product();
         product.setName("Admin Test Phone");
-        product.setPrice(49999.0);
+        product.setPrice(new BigDecimal("49999.00"));
         product.setStockQuantity(20);
         product.setCategory(category);
         product.setActive(true);

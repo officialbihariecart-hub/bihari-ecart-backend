@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
         // 6. Copy CartItems to OrderItems with BigDecimal unit price snapshot
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();
-            BigDecimal unitPrice = BigDecimal.valueOf(product.getPrice());
+            BigDecimal unitPrice = product.getPrice();
 
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
