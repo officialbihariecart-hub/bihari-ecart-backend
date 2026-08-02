@@ -95,7 +95,7 @@ public class WishlistServiceIntegrationTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(product1.getId(), response.getProductId());
-        Assertions.assertEquals(1, wishlistItemRepository.count());
+        Assertions.assertEquals(1, wishlistItemRepository.countByUser(user));
     }
 
     @Test
@@ -145,10 +145,10 @@ public class WishlistServiceIntegrationTest {
     @Test
     public void testRemoveProduct() {
         wishlistService.addProductToWishlist(user.getEmail(), new WishlistItemRequest(product1.getId()));
-        Assertions.assertEquals(1, wishlistItemRepository.count());
+        Assertions.assertEquals(1, wishlistItemRepository.countByUser(user));
 
         wishlistService.removeProductFromWishlist(user.getEmail(), product1.getId());
-        Assertions.assertEquals(0, wishlistItemRepository.count());
+        Assertions.assertEquals(0, wishlistItemRepository.countByUser(user));
     }
 
     @Test
