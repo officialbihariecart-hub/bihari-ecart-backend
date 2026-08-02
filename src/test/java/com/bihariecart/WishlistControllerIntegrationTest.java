@@ -65,8 +65,9 @@ public class WishlistControllerIntegrationTest {
                 .apply(springSecurity())
                 .build();
 
+        String uniqueSuffix = java.util.UUID.randomUUID().toString();
         Category category = new Category();
-        category.setName("Home Appliances");
+        category.setName("Home Appliances-" + uniqueSuffix);
         categoryRepository.save(category);
 
         product = new Product();
@@ -78,7 +79,7 @@ public class WishlistControllerIntegrationTest {
         productRepository.save(product);
 
         user = new User();
-        user.setEmail("testuser@example.com");
+        user.setEmail("testuser-" + uniqueSuffix + "@example.com");
         user.setFullName("Test User");
         user.setPassword("password");
         user.setRole(Role.ROLE_USER);

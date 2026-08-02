@@ -52,8 +52,9 @@ public class WishlistServiceIntegrationTest {
 
     @BeforeEach
     public void setup() {
+        String uniqueSuffix = java.util.UUID.randomUUID().toString();
         Category category = new Category();
-        category.setName("Electronics");
+        category.setName("Electronics-" + uniqueSuffix);
         categoryRepository.save(category);
 
         product1 = new Product();
@@ -73,14 +74,14 @@ public class WishlistServiceIntegrationTest {
         productRepository.save(product2);
 
         user = new User();
-        user.setEmail("user1@example.com");
+        user.setEmail("user1-" + uniqueSuffix + "@example.com");
         user.setFullName("User One");
         user.setPassword("password");
         user.setRole(Role.ROLE_USER);
         userRepository.save(user);
 
         otherUser = new User();
-        otherUser.setEmail("user2@example.com");
+        otherUser.setEmail("user2-" + uniqueSuffix + "@example.com");
         otherUser.setFullName("User Two");
         otherUser.setPassword("password");
         otherUser.setRole(Role.ROLE_USER);
